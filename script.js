@@ -1,3 +1,4 @@
+// script.js
 document.addEventListener('DOMContentLoaded', () => {
     // --- LÓGICA DA PÁGINA DE BOAS-VINDAS ---
     const welcomeScreen = document.getElementById('welcome-screen');
@@ -6,21 +7,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Garante que a tela de boas-vindas esteja visível ao carregar.
     if (welcomeScreen) {
-        welcomeScreen.classList.add('active');
+        welcomeScreen.classList.add('active'); // Garante que começa visível
     }
 
     if (enterButton) {
         enterButton.addEventListener('click', () => {
             if (welcomeScreen) {
                 welcomeScreen.classList.remove('active');
-                welcomeScreen.classList.add('hidden');
+                welcomeScreen.classList.add('hidden'); // Inicia a transição para sumir
             }
 
             // Após a transição da tela de boas-vindas, mostra o conteúdo principal
             setTimeout(() => {
                 if (mainContent) {
-                    mainContent.classList.add('active');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    mainContent.classList.add('active'); // Mostra a página principal
+                    window.scrollTo({ top: 0, behavior: 'smooth' }); // Rola para o topo
                 }
                 // CHAMA A FUNÇÃO QUE INICIALIZA TUDO NA PÁGINA PRINCIPAL
                 initializeMainPageFunctions();
@@ -29,6 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- VARIÁVEIS GLOBAIS OU ACESSÍVEIS EM TODAS AS FUNÇÕES AUXILIARES ---
+    // É importante que essas variáveis sejam declaradas fora de qualquer função
+    // para que possam ser acessadas por `initializeMainPageFunctions` E pelas funções auxiliares.
     const backgroundMusic = document.getElementById('background-music');
     const musicToggleButton = document.getElementById('music-toggle');
     const toggleBtn = document.getElementById("toggle-mode");
@@ -115,34 +118,43 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(mostrarMensagemRomantica, 3000); // Atraso inicial para a primeira mensagem
         setInterval(mostrarMensagemRomantica, 15000); // Exibe uma nova mensagem a cada 15 segundos
 
-        // --- LÓGICA DO PLAYER DE MÚSICA CORRIGIDA ---
-        if (backgroundMusic && musicToggleButton) {
-            // Pega o elemento do ícone dentro do botão
-            const musicIcon = musicToggleButton.querySelector('i');
+        // --- LÓGICA DO PLAYER DE MÚSICA ---
+        if (backgroundMusic) {
+            backgroundMusic.muted = false; // Desmuta a música
+            const playPromise = backgroundMusic.play(); // Tenta reproduzir
 
-            // Inicia a música mutada para evitar o bloqueio de autoplay do navegador.
-            backgroundMusic.muted = true;
-            backgroundMusic.play();
-
-            // Define o ícone inicial para mudo, indicando que o som está desativado.
-            if (musicIcon) {
-                musicIcon.className = 'fas fa-volume-mute';
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    // Reprodução iniciada com sucesso
+                    if (musicToggleButton) {
+                        musicToggleButton.classList.add('active-btn'); // Mostra o botão de controle
+                        musicToggleButton.querySelector('i').classList.remove('fa-volume-mute', 'fa-play');
+                        musicToggleButton.querySelector('i').classList.add('fa-volume-up');
+                    }
+                })
+                .catch(error => {
+                    // A reprodução foi bloqueada (ex: auto-play sem interação)
+                    console.warn("A reprodução automática foi impedida ou negada pelo navegador:", error);
+                    if (musicToggleButton) {
+                        musicToggleButton.classList.add('active-btn'); // Ainda mostra o botão
+                        musicToggleButton.innerHTML = '<i class="fas fa-play"></i>'; // Altera o ícone para "Play"
+                        backgroundMusic.muted = true; // Mantém mutado se não pôde tocar
+                    }
+                });
             }
+        }
 
-            // Listener para o Botão de Controle de Música (Play/Pause)
+        // --- Listener para o Botão de Controle de Música (Play/Pause) ---
+        if (musicToggleButton) {
             musicToggleButton.addEventListener('click', () => {
-                if (backgroundMusic.paused || backgroundMusic.muted) {
-                    backgroundMusic.muted = false; // Desmuta para permitir o som
+                if (backgroundMusic.paused) {
                     backgroundMusic.play();
-                    if (musicIcon) {
-                        musicIcon.className = 'fas fa-volume-up'; // Muda o ícone para "volume"
-                    }
+                    musicToggleButton.querySelector('i').classList.remove('fa-volume-mute', 'fa-play');
+                    musicToggleButton.querySelector('i').classList.add('fa-volume-up');
                 } else {
-                    backgroundMusic.muted = true; // Muta a música
                     backgroundMusic.pause();
-                    if (musicIcon) {
-                        musicIcon.className = 'fas fa-volume-mute'; // Muda o ícone para "mudo"
-                    }
+                    musicToggleButton.querySelector('i').classList.remove('fa-volume-up');
+                    musicToggleButton.querySelector('i').classList.add('fa-volume-mute');
                 }
             });
         }
@@ -156,6 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateClock() {
+        // 'startDate' é acessível aqui por ser global
         const now = new Date();
         const difference = now.getTime() - startDate.getTime();
 
@@ -188,12 +201,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function setCarouselWidthAndPosition() {
+        // As variáveis do carrossel são acessíveis aqui por serem globais
         if (!carouselSlide || !carouselContainer || carouselImages.length === 0) {
             console.warn("Elementos do carrossel não encontrados ou sem imagens.");
             return;
         }
 
         const totalImages = carouselImages.length;
+        // Recalcular a largura para garantir que esteja sempre correta, mesmo após redimensionamento
         let currentSlideWidth = carouselContainer.clientWidth;
 
         if (currentSlideWidth === 0 && carouselImages[0]) {
@@ -210,6 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function nextSlide() {
+        // As variáveis do carrossel são acessíveis aqui por serem globais
         if (!carouselSlide || !carouselImages.length || !carouselContainer) return;
 
         const totalImages = carouselImages.length;
@@ -221,6 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function prevSlide() {
+        // As variáveis do carrossel são acessíveis aqui por serem globais
         if (!carouselSlide || !carouselImages.length || !carouselContainer) return;
 
         const totalImages = carouselImages.length;
@@ -232,9 +249,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startAutoSlide() {
+        // 'autoSlideInterval' é acessível aqui por ser global
         if (!carouselSlide) return;
 
-        clearInterval(autoSlideInterval);
+        clearInterval(autoSlideInterval); // Limpa qualquer intervalo anterior
         autoSlideInterval = setInterval(nextSlide, 10000); // 10 segundos
     }
 
@@ -261,4 +279,5 @@ document.addEventListener('DOMContentLoaded', () => {
             container.classList.add("visivel");
         }, 500);
     }
+
 }); // Fim do DOMContentLoaded
