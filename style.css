@@ -537,3 +537,11 @@ footer {
 .nossa-familia .p{
     font-size: 80em;
 }
+
+.nos img{
+     width: 250px;
+    
+    margin: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px;
+}
