@@ -538,10 +538,11 @@ footer {
     font-size: 80em;
 }
 
-.nos img{
-     width: 250px;
-    
-    margin: 10px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px;
+.nos img {
+  width: 100%; 
+  max-width: 250px;             
+  height: auto;       
+  margin: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px;
 }
